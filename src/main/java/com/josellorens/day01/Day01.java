@@ -8,8 +8,17 @@ public class Day01 {
     public static void main(String[] args) {
         final var numbers = inputLinesAsIntegersForDay(1);
 
-        System.out.printf("Part1 solution: %s%n", part1(numbers));
-        System.out.printf("Part2 solution: %s%n", part2(numbers));
+        final var  startTime = System.nanoTime();
+        final var part1Solution = part1(numbers);
+        final var  endTime = System.nanoTime();
+        final var duration = (endTime - startTime) / 1_000_000F;
+        System.out.printf("[%.2f ms] Part1 solution: %s. %n", duration, part1Solution);
+
+        final var  startTime2 = System.nanoTime();
+        final var part2Solution = part2(numbers);
+        final var  endTime2 = System.nanoTime();
+        final var duration2 = (endTime2 - startTime2) / 1_000_000F;
+        System.out.printf("[%.2f ms] Part2 solution: %s. %n", duration2, part2Solution);
     }
 
     private static Integer part1(List<Integer> numbers) {
@@ -24,7 +33,7 @@ public class Day01 {
 
     private static Integer part2(List<Integer> numbers) {
         var increases = 0;
-        for (var i = 3; i < numbers.size() - 2; i++) {
+        for (var i = 3; i < numbers.size(); i++) {
             if (windowStartingAt(numbers, i) > windowStartingAt(numbers, i - 1)) {
                 increases++;
             }
