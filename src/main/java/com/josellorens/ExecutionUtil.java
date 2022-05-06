@@ -2,6 +2,8 @@ package com.josellorens;
 
 import java.util.function.Function;
 
+import static java.lang.System.nanoTime;
+
 public class ExecutionUtil {
 
     public static class TimedExecution {
@@ -16,9 +18,9 @@ public class ExecutionUtil {
     }
 
     public static <E> TimedExecution timedExecution(Function<E, String> function, E input) {
-        final var startTime = System.nanoTime();
+        final var startTime = nanoTime();
         final var result = function.apply(input);
-        final var endTime = System.nanoTime();
+        final var endTime = nanoTime();
         final var duration = (endTime - startTime) / 1_000_000F;
         return new TimedExecution(result, duration);
     }

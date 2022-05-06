@@ -25,7 +25,7 @@ public class Day01 implements Day {
                 increases++;
             }
         }
-        return String.valueOf(increases);
+        return String.format("%d", increases);
     }
 
     private static String part2(List<Integer> numbers) {
@@ -35,7 +35,7 @@ public class Day01 implements Day {
                 increases++;
             }
         }
-        return String.valueOf(increases);
+        return String.format("%d", increases);
     }
 
     private static int windowStartingAt(List<Integer> numbers, int i) {
