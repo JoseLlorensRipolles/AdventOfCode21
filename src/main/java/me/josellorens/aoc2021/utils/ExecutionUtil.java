@@ -1,6 +1,6 @@
-package com.josellorens;
+package me.josellorens.aoc2021.utils;
 
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.System.nanoTime;
 
@@ -17,9 +17,9 @@ public class ExecutionUtil {
         public float milliseconds;
     }
 
-    public static <E> TimedExecution timedExecution(Function<E, String> function, E input) {
+    public static TimedExecution timedExecution(Supplier<String> function) {
         final var startTime = nanoTime();
-        final var result = function.apply(input);
+        final var result = function.get();
         final var endTime = nanoTime();
         final var duration = (endTime - startTime) / 1_000_000F;
         return new TimedExecution(result, duration);
