@@ -17,13 +17,11 @@ public class ExecutionUtil {
         public float milliseconds;
     }
 
-    public static TimedExecution timedExecution(Supplier<String> function) {
+    public static TimedExecution timedExecution(Supplier<String> dayPart) {
         final var startTime = nanoTime();
-        final var result = function.get();
+        final var result = dayPart.get();
         final var endTime = nanoTime();
-        final var duration = (endTime - startTime) / 1_000_000F;
-        return new TimedExecution(result, duration);
+        final var milliseconds = (endTime - startTime) / 1_000_000F;
+        return new TimedExecution(result, milliseconds);
     }
-
-
 }
