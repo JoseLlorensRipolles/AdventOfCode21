@@ -3,7 +3,6 @@ package me.josellorens.aoc2021.day02;
 import me.josellorens.aoc2021.DaySolver;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class Day02Solver implements DaySolver {
 
@@ -14,54 +13,42 @@ public class Day02Solver implements DaySolver {
     }
 
     public String part1() {
-        var hor = 0;
-        var depth = 0;
-        final var pattern = Pattern.compile("(\\w+) (\\d+)");
-        for (final var line : inputLines) {
-            final var matcher = pattern.matcher(line);
-            matcher.find();
-            final var instruction = matcher.group(1);
-            final var value = Integer.parseInt(matcher.group(2));
+        final var state = new SubmarineState(0, 0, 0);
 
-            switch (instruction) {
-                case "forward":
-                    hor += value;
+        for (final var line : inputLines) {
+            final var instruction = SubmarineInstruction.from(line);
+            switch (instruction.direction) {
+                case FORWARD:
+                    state.horizontal += instruction.value;
                     break;
-                case "down":
-                    depth += value;
+                case DOWN:
+                    state.depth += instruction.value;
                     break;
-                case "up":
-                    depth -= value;
+                case UP:
+                    state.depth -= instruction.value;
                     break;
             }
         }
-        return String.format("%d", hor * depth);
+        return String.format("%d", state.horizontal * state.depth);
     }
 
     public String part2() {
-        var hor = 0;
-        var depth = 0;
-        var aim = 0;
-        final var pattern = Pattern.compile("(\\w+) (\\d+)");
+        final var state = new SubmarineState(0, 0, 0);
         for (final var line : inputLines) {
-            final var matcher = pattern.matcher(line);
-            matcher.find();
-            final var instruction = matcher.group(1);
-            final var value = Integer.parseInt(matcher.group(2));
-
-            switch (instruction) {
-                case "forward":
-                    hor += value;
-                    depth += aim * value;
+            final var instruction = SubmarineInstruction.from(line);
+            switch (instruction.direction) {
+                case FORWARD:
+                    state.horizontal += instruction.value;
+                    state.depth += state.aim * instruction.value;
                     break;
-                case "down":
-                    aim += value;
+                case DOWN:
+                    state.aim += instruction.value;
                     break;
-                case "up":
-                    aim -= value;
+                case UP:
+                    state.aim -= instruction.value;
                     break;
             }
         }
-        return String.format("%d", hor * depth);
+        return String.format("%d", state.horizontal * state.depth);
     }
 }
