@@ -4,6 +4,8 @@ import me.josellorens.aoc2021.DaySolver;
 
 import java.util.List;
 
+import static me.josellorens.aoc2021.day02.SubmarineState.Builder.submarineState;
+
 public class Day02Solver implements DaySolver {
 
     final List<String> inputLines;
@@ -13,7 +15,7 @@ public class Day02Solver implements DaySolver {
     }
 
     public String part1() {
-        final var state = new SubmarineState(0, 0, 0);
+        final var state = submarineState().horizontal(0).depth(0).aim(0).build();
 
         for (final var line : inputLines) {
             final var instruction = SubmarineInstruction.from(line);
@@ -33,7 +35,8 @@ public class Day02Solver implements DaySolver {
     }
 
     public String part2() {
-        final var state = new SubmarineState(0, 0, 0);
+        final var state = submarineState().horizontal(0).depth(0).aim(0).build();
+
         for (final var line : inputLines) {
             final var instruction = SubmarineInstruction.from(line);
             switch (instruction.direction) {
