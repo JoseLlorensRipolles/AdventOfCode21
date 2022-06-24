@@ -36,7 +36,7 @@ public class Day01Solver implements DaySolver {
         return String.format("%d", increases);
     }
 
-    private static int windowStartingAt(List<Integer> numbers, int i) {
+    private int windowStartingAt(List<Integer> numbers, int i) {
         return numbers.get(i) + numbers.get(i - 1) + numbers.get(i - 2);
     }
 }

@@ -2,6 +2,7 @@ package me.josellorens.aoc2021;
 
 import me.josellorens.aoc2021.day01.Day01Solver;
 import me.josellorens.aoc2021.day02.Day02Solver;
+import me.josellorens.aoc2021.day03.Day03Solver;
 
 import static me.josellorens.aoc2021.utils.ExecutionUtil.timedExecution;
 import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
@@ -20,5 +21,11 @@ public class Main {
         System.out.printf("[%.2f ms] Part1 solution: %s. %n", day02part1result.milliseconds, day02part1result.result);
         final var day02part2result = timedExecution(day02Solver::part2);
         System.out.printf("[%.2f ms] Part2 solution: %s. %n", day02part2result.milliseconds, day02part2result.result);
+
+        final var day03Solver = new Day03Solver(inputLinesForDay(3));
+        final var day03part1result = timedExecution(day03Solver::part1);
+        System.out.printf("[%.2f ms] Part1 solution: %s. %n", day03part1result.milliseconds, day03part1result.result);
+        final var day03part2result = timedExecution(day03Solver::part2);
+        System.out.printf("[%.2f ms] Part2 solution: %s. %n", day03part2result.milliseconds, day03part2result.result);
     }
 }
