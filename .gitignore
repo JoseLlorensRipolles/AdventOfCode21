@@ -49,3 +49,6 @@ build.gradle
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+*.iml
+out
