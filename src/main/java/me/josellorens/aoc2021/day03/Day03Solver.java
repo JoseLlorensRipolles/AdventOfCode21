@@ -19,66 +19,52 @@ public class Day03Solver implements DaySolver {
     }
 
     public String part1() {
-        var gammaBuilder = new StringBuilder();
-        for (var i = 0; i < numbers.get(0).length(); i++) {
-            var average = 0.0;
-            for (int j = 0; j < numbers.size(); j++) {
-                String number = numbers.get(j);
-                var digit = parseInt(number.substring(i, i + 1));
-                average = addToOnlineAverage(average, digit, j + 1);
-            }
-            int newDigit = (int) Math.round(average);
-            gammaBuilder.append(newDigit);
+        var gamma = 0;
+        var numCols = numbers.get(0).length();
+        for (var i = 0; i < numCols; i++) {
+            gamma = gamma << 1;
+            var average = getAverageForColumn(this.numbers, i);
+            var newDigit = Math.round(average);
+            gamma += newDigit;
         }
-        var gamma = gammaBuilder.toString();
-        var epsilon = invert(gamma);
-
-        var result = parseInt(gamma, 2) * parseInt(epsilon, 2);
-        return result + "";
-    }
-
-    private String invert(String gamma) {
-        var epsilonBuilder = new StringBuilder();
-        for (var digit : gamma.toCharArray()) {
-            if (digit == '0') {
-                epsilonBuilder.append('1');
-            } else {
-                epsilonBuilder.append('0');
-            }
-        }
-        return epsilonBuilder.toString();
-    }
-
-    private double addToOnlineAverage(double currentAverage, int newValue, int numberOfValues) {
-        return currentAverage + ((newValue - currentAverage) / numberOfValues);
-
+        var epsilon = invertBits(gamma, numCols);
+        var result = gamma * epsilon;
+        return String.valueOf(result);
     }
 
     public String part2() {
-        var oxygenValue = parseInt(findRating(false), 2);
-        var co2Value = parseInt(findRating(true), 2);
-        var result = oxygenValue * co2Value;
-        return result + "";
+        var oxygenRating = parseInt(findRating(false), 2);
+        var co2Rating = parseInt(findRating(true), 2);
+        var result = oxygenRating * co2Rating;
+        return String.valueOf(result);
     }
 
-    private String findRating(boolean invert) {
+    private double getAverageForColumn(List<String> numbers, int column) {
+        var average = 0.0;
+        for (int j = 0; j < numbers.size(); j++) {
+            String number = numbers.get(j);
+            var digit = parseInt(number.substring(column, column + 1));
+            average += (digit - average) / (j + 1);
+        }
+        return average;
+    }
+
+    private int invertBits(int gamma, int numColumns) {
+        final var mask = (int) Math.pow(2, numColumns) - 1;
+        return (~gamma) & mask;
+    }
+
+    private String findRating(boolean leastCommon) {
         var candidates = new ArrayList<>(this.numbers);
         for (var i = 0; i < candidates.get(0).length(); i++) {
-            var average = 0.0;
-            for (int j = 0; j < candidates.size(); j++) {
-                var number = candidates.get(j);
-                var digit = parseInt(number.substring(i, i + 1));
-                average = addToOnlineAverage(average, digit, j + 1);
-            }
-            var aux = average == 0.5 ? 1 : Math.round(average);
-            if (invert) {
-                aux = aux == 1 ? 0 : 1;
-            }
-            var referenceBit = aux + "";
+            var average = getAverageForColumn(candidates, i);
+            var bit = (int) Math.round(average);
+            bit = leastCommon ? bit ^ 1 : bit;
+            var bitString = String.valueOf(bit);
 
             var newCandidates = new ArrayList<String>();
             for (var candidate : candidates) {
-                if (candidate.substring(i, i + 1).equals(referenceBit)) {
+                if (candidate.substring(i, i + 1).equals(bitString)) {
                     newCandidates.add(candidate);
                 }
             }
@@ -88,7 +74,7 @@ public class Day03Solver implements DaySolver {
                 return candidates.get(0);
             }
         }
-        throw new IllegalStateException();
+        throw new IllegalStateException("A single candidate rating was not found");
     }
 
     public static void main(String[] args) {
