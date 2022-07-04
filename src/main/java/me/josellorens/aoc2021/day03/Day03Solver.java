@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
+import static java.util.stream.Collectors.averagingInt;
 import static me.josellorens.aoc2021.utils.ExecutionUtil.timedExecution;
 import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
 
@@ -40,13 +41,9 @@ public class Day03Solver implements DaySolver {
     }
 
     private double getAverageForColumn(List<String> numbers, int column) {
-        var average = 0.0;
-        for (int j = 0; j < numbers.size(); j++) {
-            String number = numbers.get(j);
-            var digit = parseInt(number.substring(column, column + 1));
-            average += (digit - average) / (j + 1);
-        }
-        return average;
+        return numbers.parallelStream()
+            .map(it -> parseInt(it.substring(column, column + 1)))
+            .collect(averagingInt(Integer::intValue));
     }
 
     private int invertBits(int gamma, int numColumns) {
