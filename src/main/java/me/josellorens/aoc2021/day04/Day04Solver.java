@@ -6,16 +6,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static java.util.stream.Collectors.toList;
+import static me.josellorens.aoc2021.day04.Board.BOARD_SIZE;
 import static me.josellorens.aoc2021.utils.ExecutionUtil.timedExecution;
 import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
 
 public class Day04Solver implements DaySolver {
 
-    Integer BOARD_SIZE = 5;
     List<Integer> draftNumbers;
-    List<List<List<Integer>>> boards = new ArrayList<>();
+    List<Board> boards = new ArrayList<>();
 
     public Day04Solver(List<String> inputLines) {
         final var inputSize = inputLines.size();
@@ -32,7 +33,7 @@ public class Day04Solver implements DaySolver {
                     .collect(toList());
                 newBoard.add(newLine);
             }
-            boards.add(newBoard);
+            boards.add(new Board(newBoard));
         }
     }
 
@@ -40,70 +41,32 @@ public class Day04Solver implements DaySolver {
         final var draftedNumbers = new HashSet<Integer>();
         for (Integer number : draftNumbers) {
             draftedNumbers.add(number);
-            for (List<List<Integer>> board : boards) {
-                if (checkWinner(board, draftedNumbers)) {
-                    return String.valueOf(sumOfUnmarked(board, draftedNumbers) * number);
-                }
+            final var result = boards.parallelStream()
+                .filter(board -> board.winner(draftedNumbers))
+                .findAny()
+                .map(board -> board.unmarkedSum(draftedNumbers) * number);
+            if (result.isPresent()) {
+                return String.valueOf(result.get());
             }
         }
         throw new IllegalStateException("No winning bingos were found");
     }
 
-    private Integer sumOfUnmarked(List<List<Integer>> board, HashSet<Integer> draftedNumbers) {
-        return board
-            .stream()
-            .flatMap(List::stream)
-            .filter(it -> !draftedNumbers.contains(it))
-            .reduce(0, Integer::sum);
-    }
-
-    private boolean checkWinner(List<List<Integer>> board, HashSet<Integer> draftedNumbers) {
-        for (List<Integer> row : board) {
-            var isWinner = true;
-            for (Integer number : row) {
-                if (!draftedNumbers.contains(number)) {
-                    isWinner = false;
-                    break;
-                }
-            }
-            if (isWinner) {
-                return true;
-            }
-        }
-
-        for (int colNumber = 0; colNumber < BOARD_SIZE; colNumber++) {
-            int finalColNumber = colNumber;
-            final var col = board.stream().map(row -> row.get(finalColNumber)).collect(toList());
-            var isWinner = true;
-            for (Integer number : col) {
-                if (!draftedNumbers.contains(number)) {
-                    isWinner = false;
-                    break;
-                }
-            }
-            if (isWinner) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public String part2() {
-        final var winningBoards = new HashSet<List<List<Integer>>>();
+        final var winningBoards = new CopyOnWriteArraySet<Board>();
         final var draftedNumbers = new HashSet<Integer>();
         for (Integer number : draftNumbers) {
             draftedNumbers.add(number);
-            for (List<List<Integer>> board : boards) {
-                if (winningBoards.contains(board)) {
-                    continue;
-                }
-                if (checkWinner(board, draftedNumbers)) {
-                    winningBoards.add(board);
-                    if (winningBoards.size() == boards.size()) {
-                        return String.valueOf(sumOfUnmarked(board, draftedNumbers) * number);
-                    }
-                }
+            final var result = boards.parallelStream()
+                .filter(board -> !winningBoards.contains(board))
+                .filter(board -> board.winner(draftedNumbers))
+                .peek(winningBoards::add)
+                .filter(__ -> winningBoards.size() == boards.size())
+                .findAny()
+                .map(board -> board.unmarkedSum(draftedNumbers) * number);
+
+            if (result.isPresent()) {
+                return String.valueOf(result.get());
             }
         }
         throw new IllegalStateException("No winning bingos were found");
