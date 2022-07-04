@@ -15,7 +15,6 @@ public class Day02Solver implements DaySolver {
     }
 
     public String part1() {
-        // This parallelization is just for fun, as it is slower than sequential execution due to the small list and overhead
         final var state = inputLines.parallelStream()
             .map(SubmarineInstruction::from)
             .map(this::executePart1Instruction)
