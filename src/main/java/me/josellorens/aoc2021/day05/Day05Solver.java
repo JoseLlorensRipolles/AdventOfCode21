@@ -61,25 +61,27 @@ public class Day05Solver implements DaySolver {
     public String part2() {
         Map<Point, Integer> pointCounter = new ConcurrentHashMap<>();
         ExecutorService executor = newFixedThreadPool(3);
-        executor.submit(() -> lines.parallelStream()
+        executor.execute(() -> lines.parallelStream()
             .filter(this::vertical)
             .forEach(line -> countPointsInVerticalLines(line, pointCounter)));
 
-        executor.submit(() -> lines.parallelStream()
+        executor.execute(() -> lines.parallelStream()
             .filter(this::horizontal)
             .forEach(line -> countPointsInHorizontalLines(line, pointCounter)));
 
-        executor.submit(() -> lines.parallelStream()
+        executor.execute(() -> lines.parallelStream()
             .filter(this::diagonal)
             .forEach(line -> countPointsInDiagonalLines(line, pointCounter)));
 
         executor.shutdown();
         try {
-            if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                throw new IllegalStateException("Executor did not finish successfully");
+            if (!executor.awaitTermination(1000, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                System.out.println("The thread executor had pending threads at shutdown. Results for this part can be wrong.");
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            executor.shutdownNow();
+            System.out.println("The thread executor had pending threads at shutdown. Results for this part can be wrong.");
         }
 
         final var result = pointCounter.values().stream().filter(it -> it > 1).count();
