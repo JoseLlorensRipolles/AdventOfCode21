@@ -4,9 +4,9 @@ import me.josellorens.aoc2021.DaySolver;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static java.lang.Math.abs;
@@ -61,28 +61,22 @@ public class Day05Solver implements DaySolver {
     public String part2() {
         Map<Point, Integer> pointCounter = new ConcurrentHashMap<>();
         ExecutorService executor = newFixedThreadPool(3);
-        executor.execute(() -> lines.parallelStream()
-            .filter(this::vertical)
-            .forEach(line -> countPointsInVerticalLines(line, pointCounter)));
 
-        executor.execute(() -> lines.parallelStream()
-            .filter(this::horizontal)
-            .forEach(line -> countPointsInHorizontalLines(line, pointCounter)));
+        final var verticalFuture = CompletableFuture.runAsync(() -> lines.parallelStream()
+                .filter(this::vertical)
+                .forEach(line -> countPointsInVerticalLines(line, pointCounter)),
+            executor);
 
-        executor.execute(() -> lines.parallelStream()
-            .filter(this::diagonal)
-            .forEach(line -> countPointsInDiagonalLines(line, pointCounter)));
+        final var horizontalFuture = CompletableFuture.runAsync(() -> lines.parallelStream()
+                .filter(this::horizontal)
+                .forEach(line -> countPointsInHorizontalLines(line, pointCounter)),
+            executor);
 
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(1000, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                System.out.println("The thread executor had pending threads at shutdown. Results for this part can be wrong.");
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            System.out.println("The thread executor had pending threads at shutdown. Results for this part can be wrong.");
-        }
+        final var diagonalFuture = CompletableFuture.runAsync(() -> lines.parallelStream()
+                .filter(this::diagonal)
+                .forEach(line -> countPointsInDiagonalLines(line, pointCounter)),
+            executor);
+        CompletableFuture.allOf(verticalFuture, horizontalFuture, diagonalFuture).join();
 
         final var result = pointCounter.values().stream().filter(it -> it > 1).count();
         return String.valueOf(result);
