@@ -77,6 +77,7 @@ public class Day05Solver implements DaySolver {
                 .forEach(line -> countPointsInDiagonalLines(line, pointCounter)),
             executor);
         CompletableFuture.allOf(verticalFuture, horizontalFuture, diagonalFuture).join();
+        executor.shutdownNow();
 
         final var result = pointCounter.values().stream().filter(it -> it > 1).count();
         return String.valueOf(result);
