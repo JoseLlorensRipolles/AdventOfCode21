@@ -22,33 +22,35 @@ public class Day06Solver implements DaySolver {
     @Override
     public String part1() {
         for (int day = 0; day < 80; day++) {
-            final var fishesEndingCycle = newBornLanternFishes[0] + regularLanternFishes[0];
-            shift(newBornLanternFishes);
-            shift(regularLanternFishes);
-            newBornLanternFishes[newBornLanternFishes.length - 1] = fishesEndingCycle;
-            regularLanternFishes[regularLanternFishes.length - 1] = fishesEndingCycle;
+            completeDay();
         }
-        final var numberOfFishes = stream(newBornLanternFishes).sum() + stream(regularLanternFishes).sum();
-        return String.valueOf(numberOfFishes);
+        return String.valueOf(numberOfFishes());
     }
 
     @Override
     public String part2() {
         for (int day = 80; day < 256; day++) {
-            final var fishesEndingCycle = newBornLanternFishes[0] + regularLanternFishes[0];
-            shift(newBornLanternFishes);
-            shift(regularLanternFishes);
-            newBornLanternFishes[newBornLanternFishes.length - 1] = fishesEndingCycle;
-            regularLanternFishes[regularLanternFishes.length - 1] = fishesEndingCycle;
+            completeDay();
         }
-        final var numberOfFishes = stream(newBornLanternFishes).sum() + stream(regularLanternFishes).sum();
-        return String.valueOf(numberOfFishes);
+        return String.valueOf(numberOfFishes());
+    }
+
+    private void completeDay() {
+        final var fishesEndingCycle = newBornLanternFishes[0] + regularLanternFishes[0];
+        shift(newBornLanternFishes);
+        shift(regularLanternFishes);
+        newBornLanternFishes[newBornLanternFishes.length - 1] = fishesEndingCycle;
+        regularLanternFishes[regularLanternFishes.length - 1] = fishesEndingCycle;
     }
 
     private void shift(long[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             array[i] = array[i + 1];
         }
+    }
+
+    private long numberOfFishes() {
+        return stream(newBornLanternFishes).sum() + stream(regularLanternFishes).sum();
     }
 
     public static void main(String[] args) {
