@@ -10,13 +10,12 @@ import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
 
 public class Day06Solver implements DaySolver {
 
-    private final long[] newBornLanternFishes = new long[9];
-    private final long[] regularLanternFishes = new long[7];
+    private final long[] lanternFishes = new long[9];
 
     public Day06Solver(List<String> inputLines) {
         stream(inputLines.get(0).split(","))
             .map(Integer::parseInt)
-            .forEach(number -> regularLanternFishes[number] += 1);
+            .forEach(number -> lanternFishes[number] += 1);
     }
 
     @Override
@@ -36,21 +35,20 @@ public class Day06Solver implements DaySolver {
     }
 
     private void completeDay() {
-        final var fishesEndingCycle = newBornLanternFishes[0] + regularLanternFishes[0];
-        shift(newBornLanternFishes);
-        shift(regularLanternFishes);
-        newBornLanternFishes[newBornLanternFishes.length - 1] = fishesEndingCycle;
-        regularLanternFishes[regularLanternFishes.length - 1] = fishesEndingCycle;
+        final var fishesEndingCycle = lanternFishes[0];
+        shiftLeft(lanternFishes);
+        lanternFishes[6] += fishesEndingCycle;
+        lanternFishes[8] = fishesEndingCycle;
     }
 
-    private void shift(long[] array) {
+    private void shiftLeft(long[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             array[i] = array[i + 1];
         }
     }
 
     private long numberOfFishes() {
-        return stream(newBornLanternFishes).sum() + stream(regularLanternFishes).sum();
+        return stream(lanternFishes).sum();
     }
 
     public static void main(String[] args) {
