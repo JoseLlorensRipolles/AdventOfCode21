@@ -57,7 +57,8 @@ public class Day07Solver {
     }
 
     private Integer fuelToAlignCrabs(CostType costType, int destination) {
-        return crabsByPosition.keySet().parallelStream()
+        return crabsByPosition.keySet()
+            .parallelStream()
             .map(origin -> fuelToMoveCrabGroup(costType, origin, destination))
             .reduce(Integer::sum)
             .orElseThrow();
