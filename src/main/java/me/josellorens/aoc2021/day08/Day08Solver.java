@@ -5,13 +5,13 @@ import me.josellorens.aoc2021.DaySolver;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
-import static me.josellorens.aoc2021.day08.SevenSegmentEntry.Builder.sevenSegmentEntry;
+import static me.josellorens.aoc2021.day08.Input08Line.Builder.input08Line;
 import static me.josellorens.aoc2021.utils.ExecutionUtil.timedExecution;
 import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
 
 public class Day08Solver implements DaySolver {
 
-    private List<SevenSegmentEntry> input;
+    private List<Input08Line> input;
 
     public Day08Solver(List<String> inputLines) {
         final var inputsSplitBySection = inputLines
@@ -23,19 +23,19 @@ public class Day08Solver implements DaySolver {
             .stream()
             .map(it -> it[0])
             .map(it -> it.split(" "))
-            .map(it -> Arrays.stream(it).map(SevenSegmentPattern::from).collect(toList()))
+            .map(Arrays::asList)
             .collect(toList());
 
         final var outputs = inputsSplitBySection
             .stream()
             .map(it -> it[1])
             .map(it -> it.split(" "))
-            .map(it -> Arrays.stream(it).map(SevenSegmentPattern::from).collect(toList()))
+            .map(Arrays::asList)
             .collect(toList());
 
         input = new ArrayList<>();
         for (int i = 0; i < entries.size(); i++) {
-            input.add(sevenSegmentEntry()
+            input.add(input08Line()
                 .uniquePatterns(entries.get(i))
                 .outputPatterns(outputs.get(i))
                 .build());
@@ -48,8 +48,8 @@ public class Day08Solver implements DaySolver {
             .map(it -> it.outputPatterns)
             .flatMap(it -> it.stream()
                 .filter(pattern -> {
-                    final var length = pattern.pattern.length();
-                    return length == 2 || length == 3 || length == 4 || length == 7;
+                    final var segmentsSize = pattern.size();
+                    return segmentsSize == 2 || segmentsSize == 3 || segmentsSize == 4 || segmentsSize == 7;
                 }))
             .collect(toList());
         var aux = segmentCount.size();
@@ -59,36 +59,31 @@ public class Day08Solver implements DaySolver {
     @Override
     public String part2() {
         final var valuesBySegmentPatterns = new ArrayList<Map<Set<Character>, Integer>>();
-        for (int i = 0; i < input.size(); i++) {
+        for (Input08Line input08Line : input) {
             final var map = new HashMap<Set<Character>, Integer>();
-            final var patterns = input.get(i).uniquePatterns;
+            final var patterns = input08Line.uniquePatterns;
 
             final var one = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 2)
                 .findFirst()
                 .orElseThrow();
 
             final var four = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 4)
                 .findFirst()
                 .orElseThrow();
 
             final var seven = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 3)
                 .findFirst()
                 .orElseThrow();
 
             final var eight = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 7)
                 .findFirst()
                 .orElseThrow();
 
             final var three = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 5)
                 .filter(it -> !it.equals(one))
                 .filter(it -> {
@@ -100,7 +95,6 @@ public class Day08Solver implements DaySolver {
                 .orElseThrow();
 
             final var six = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 6)
                 .filter(it -> !it.equals(seven))
                 .filter(it -> {
@@ -112,7 +106,6 @@ public class Day08Solver implements DaySolver {
                 .orElseThrow();
 
             final var nine = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 6)
                 .filter(it -> !it.equals(four))
                 .filter(it -> {
@@ -124,7 +117,6 @@ public class Day08Solver implements DaySolver {
                 .orElseThrow();
 
             final var two = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 5)
                 .filter(it -> !it.equals(six))
                 .filter(it -> !it.equals(three))
@@ -137,7 +129,6 @@ public class Day08Solver implements DaySolver {
                 .orElseThrow();
 
             final var five = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 5)
                 .filter(it -> !it.equals(six))
                 .filter(it -> {
@@ -149,7 +140,6 @@ public class Day08Solver implements DaySolver {
                 .orElseThrow();
 
             final var zero = patterns.stream()
-                .map(SevenSegmentPattern::asCharacterSet)
                 .filter(it -> it.size() == 6)
                 .filter(it -> !it.equals(six) && !it.equals(nine))
                 .findFirst()
@@ -165,19 +155,17 @@ public class Day08Solver implements DaySolver {
             map.put(seven, 7);
             map.put(eight, 8);
             map.put(nine, 9);
-
             valuesBySegmentPatterns.add(map);
-
         }
 
         var totalValue = 0;
         for (int i = 0; i < input.size(); i++) {
             final var valuesBySegmentPattern = valuesBySegmentPatterns.get(i);
             final var outputValues = input.get(i).outputPatterns;
-            totalValue += valuesBySegmentPattern.get(outputValues.get(0).asCharacterSet()) * 1000
-                + valuesBySegmentPattern.get(outputValues.get(1).asCharacterSet()) * 100
-                + valuesBySegmentPattern.get(outputValues.get(2).asCharacterSet()) * 10
-                + valuesBySegmentPattern.get(outputValues.get(3).asCharacterSet());
+            totalValue += valuesBySegmentPattern.get(outputValues.get(0)) * 1000
+                + valuesBySegmentPattern.get(outputValues.get(1)) * 100
+                + valuesBySegmentPattern.get(outputValues.get(2)) * 10
+                + valuesBySegmentPattern.get(outputValues.get(3));
 
         }
         return String.valueOf(totalValue);
