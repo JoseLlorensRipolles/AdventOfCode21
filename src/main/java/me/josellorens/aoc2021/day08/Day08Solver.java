@@ -64,10 +64,10 @@ public class Day08Solver implements DaySolver {
             .map(it -> {
                 final var patterns = it.uniquePatterns;
 
-                final var one = getByLength(patterns, 2);
-                final var four = getByLength(patterns, 4);
-                final var seven = getByLength(patterns, 3);
-                final var eight = getByLength(patterns, 7);
+                final var one = getBySize(patterns, 2);
+                final var four = getBySize(patterns, 4);
+                final var seven = getBySize(patterns, 3);
+                final var eight = getBySize(patterns, 7);
                 final var three = getBySizeAndIntersectionSize(patterns, 5, one, 2);
                 final var six = getBySizeAndIntersectionSize(patterns, 6, seven, 2);
                 final var nine = getBySizeAndIntersectionSize(patterns, 6, four, 4);
@@ -120,7 +120,7 @@ public class Day08Solver implements DaySolver {
             .orElseThrow();
     }
 
-    private static Set<Character> getByLength(List<Set<Character>> patterns, int size) {
+    private static Set<Character> getBySize(List<Set<Character>> patterns, int size) {
         return patterns.stream()
             .filter(it -> it.size() == size)
             .findFirst()
