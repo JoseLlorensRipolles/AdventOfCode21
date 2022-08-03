@@ -11,7 +11,7 @@ import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
 
 public class Day08Solver implements DaySolver {
 
-    private List<Input08Line> input;
+    private final List<Input08Line> input;
 
     public Day08Solver(List<String> inputLines) {
         final var inputsSplitBySection = inputLines
@@ -19,7 +19,7 @@ public class Day08Solver implements DaySolver {
             .map(it -> it.split(" \\| "))
             .collect(toList());
 
-        final var entries = inputsSplitBySection
+        final var uniqueEntries = inputsSplitBySection
             .stream()
             .map(it -> it[0])
             .map(it -> it.split(" "))
@@ -34,9 +34,9 @@ public class Day08Solver implements DaySolver {
             .collect(toList());
 
         input = new ArrayList<>();
-        for (int i = 0; i < entries.size(); i++) {
+        for (int i = 0; i < uniqueEntries.size(); i++) {
             input.add(input08Line()
-                .uniquePatterns(entries.get(i))
+                .uniquePatterns(uniqueEntries.get(i))
                 .outputPatterns(outputs.get(i))
                 .build());
         }
@@ -44,131 +44,87 @@ public class Day08Solver implements DaySolver {
 
     @Override
     public String part1() {
-        final var segmentCount = input.stream()
+        final var segmentCount = input
+            .parallelStream()
             .map(it -> it.outputPatterns)
-            .flatMap(it -> it.stream()
+            .map(it -> it.stream()
                 .filter(pattern -> {
-                    final var segmentsSize = pattern.size();
-                    return segmentsSize == 2 || segmentsSize == 3 || segmentsSize == 4 || segmentsSize == 7;
-                }))
-            .collect(toList());
-        var aux = segmentCount.size();
-        return String.valueOf(aux);
+                    final var size = pattern.size();
+                    return size == 2 || size == 3 || size == 4 || size == 7;
+                })
+                .count())
+            .reduce(0L, Long::sum);
+        return String.valueOf(segmentCount);
     }
 
     @Override
     public String part2() {
-        final var valuesBySegmentPatterns = new ArrayList<Map<Set<Character>, Integer>>();
-        for (Input08Line input08Line : input) {
-            final var map = new HashMap<Set<Character>, Integer>();
-            final var patterns = input08Line.uniquePatterns;
+        final var valuesBySegmentPatterns = input
+            .parallelStream()
+            .map(it -> {
+                final var patterns = it.uniquePatterns;
 
-            final var one = patterns.stream()
-                .filter(it -> it.size() == 2)
-                .findFirst()
-                .orElseThrow();
+                final var one = getByLength(patterns, 2);
+                final var four = getByLength(patterns, 4);
+                final var seven = getByLength(patterns, 3);
+                final var eight = getByLength(patterns, 7);
+                final var three = getBySizeAndIntersectionSize(patterns, 5, one, 2);
+                final var six = getBySizeAndIntersectionSize(patterns, 6, seven, 2);
+                final var nine = getBySizeAndIntersectionSize(patterns, 6, four, 4);
+                final var two = getBySizeAndIntersectionSize(patterns, 5, four, 2);
+                final var five = getBySizeAndIntersectionSize(patterns, 5, six, 5);
+                final var zero = getBySizeAndIntersectionSize(patterns, 6, five, 4);
 
-            final var four = patterns.stream()
-                .filter(it -> it.size() == 4)
-                .findFirst()
-                .orElseThrow();
-
-            final var seven = patterns.stream()
-                .filter(it -> it.size() == 3)
-                .findFirst()
-                .orElseThrow();
-
-            final var eight = patterns.stream()
-                .filter(it -> it.size() == 7)
-                .findFirst()
-                .orElseThrow();
-
-            final var three = patterns.stream()
-                .filter(it -> it.size() == 5)
-                .filter(it -> !it.equals(one))
-                .filter(it -> {
-                    final var intersection = new HashSet<>(it);
-                    intersection.retainAll(one);
-                    return intersection.size() == 2;
-                })
-                .findFirst()
-                .orElseThrow();
-
-            final var six = patterns.stream()
-                .filter(it -> it.size() == 6)
-                .filter(it -> !it.equals(seven))
-                .filter(it -> {
-                    final var intersection = new HashSet<>(it);
-                    intersection.retainAll(seven);
-                    return intersection.size() == 2;
-                })
-                .findFirst()
-                .orElseThrow();
-
-            final var nine = patterns.stream()
-                .filter(it -> it.size() == 6)
-                .filter(it -> !it.equals(four))
-                .filter(it -> {
-                    final var intersection = new HashSet<>(it);
-                    intersection.retainAll(four);
-                    return intersection.size() == 4;
-                })
-                .findFirst()
-                .orElseThrow();
-
-            final var two = patterns.stream()
-                .filter(it -> it.size() == 5)
-                .filter(it -> !it.equals(six))
-                .filter(it -> !it.equals(three))
-                .filter(it -> {
-                    final var intersection = new HashSet<>(it);
-                    intersection.retainAll(six);
-                    return intersection.size() == 4;
-                })
-                .findFirst()
-                .orElseThrow();
-
-            final var five = patterns.stream()
-                .filter(it -> it.size() == 5)
-                .filter(it -> !it.equals(six))
-                .filter(it -> {
-                    final var intersection = new HashSet<>(it);
-                    intersection.retainAll(six);
-                    return intersection.size() == 5;
-                })
-                .findFirst()
-                .orElseThrow();
-
-            final var zero = patterns.stream()
-                .filter(it -> it.size() == 6)
-                .filter(it -> !it.equals(six) && !it.equals(nine))
-                .findFirst()
-                .orElseThrow();
-
-            map.put(zero, 0);
-            map.put(one, 1);
-            map.put(two, 2);
-            map.put(three, 3);
-            map.put(four, 4);
-            map.put(five, 5);
-            map.put(six, 6);
-            map.put(seven, 7);
-            map.put(eight, 8);
-            map.put(nine, 9);
-            valuesBySegmentPatterns.add(map);
-        }
+                return Map.of(
+                    zero, 0,
+                    one, 1,
+                    two, 2,
+                    three, 3,
+                    four, 4,
+                    five, 5,
+                    six, 6,
+                    seven, 7,
+                    eight, 8,
+                    nine, 9);
+            })
+            .collect(toList());
 
         var totalValue = 0;
         for (int i = 0; i < input.size(); i++) {
             final var valuesBySegmentPattern = valuesBySegmentPatterns.get(i);
             final var outputValues = input.get(i).outputPatterns;
-            totalValue += valuesBySegmentPattern.get(outputValues.get(0)) * 1000
-                + valuesBySegmentPattern.get(outputValues.get(1)) * 100
-                + valuesBySegmentPattern.get(outputValues.get(2)) * 10
-                + valuesBySegmentPattern.get(outputValues.get(3));
+
+            var currentValue = 0;
+            for (int j = 0; j < 4; j++) {
+                currentValue += valuesBySegmentPattern.get(outputValues.get(j)) * (1000 / (Math.pow(10, j)));
+            }
+            totalValue += currentValue;
 
         }
         return String.valueOf(totalValue);
+    }
+
+    private static Set<Character> getBySizeAndIntersectionSize(List<Set<Character>> patterns,
+                                                               int size,
+                                                               Set<Character> intersecting,
+                                                               int intersectionSize) {
+        return patterns.stream()
+            .filter(it -> it.size() == size)
+            .filter(it -> !it.equals(intersecting))
+            .filter(it -> {
+                final var intersection = new HashSet<>(it);
+                intersection.retainAll(intersecting);
+                return intersection.size() == intersectionSize;
+            })
+            .findFirst()
+            .orElseThrow();
+    }
+
+    private static Set<Character> getByLength(List<Set<Character>> patterns, int size) {
+        return patterns.stream()
+            .filter(it -> it.size() == size)
+            .findFirst()
+            .orElseThrow();
     }
 
     public static void main(String[] args) {
