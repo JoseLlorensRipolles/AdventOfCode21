@@ -4,7 +4,6 @@ import me.josellorens.aoc2021.DaySolver;
 import me.josellorens.aoc2021.day05.Point;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.reverseOrder;
 import static java.util.stream.Collectors.toList;
@@ -14,7 +13,7 @@ import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
 
 public class Day09Solver implements DaySolver {
 
-    private Map<Point, Integer> heightMap = new HashMap<>();
+    private final Map<Point, Integer> heightMap = new HashMap<>();
     private final int mapWidth;
     private final int mapHeight;
 
@@ -35,10 +34,10 @@ public class Day09Solver implements DaySolver {
     @Override
     public String part1() {
         var result = heightMap.keySet()
-            .stream()
+            .parallelStream()
             .filter(this::localMinimum)
-            .map(it -> heightMap.get(it))
-            .map(it -> it +1)
+            .map(heightMap::get)
+            .map(it -> it + 1)
             .reduce(Integer::sum)
             .orElseThrow();
         return String.valueOf(result);
@@ -46,61 +45,16 @@ public class Day09Solver implements DaySolver {
 
     @Override
     public String part2() {
-        final var localMinimums = heightMap.keySet()
-            .stream()
+        final var basins = heightMap.keySet()
+            .parallelStream()
             .filter(this::localMinimum)
             .map(this::basin)
             .map(Set::size)
             .sorted(reverseOrder())
             .collect(toList());
 
-        final var result = localMinimums.get(0) * localMinimums.get(1) * localMinimums.get(2);
+        final var result = basins.get(0) * basins.get(1) * basins.get(2);
         return String.valueOf(result);
-    }
-
-    private Set<Point> basin(Point localMinimum) {
-        Set<Point> visitedPoints = new HashSet<>();
-        Deque<Point> pointsToVisit = new LinkedList<>();
-        pointsToVisit.add(localMinimum);
-
-        while (!pointsToVisit.isEmpty()){
-            final var currentPoint = pointsToVisit.pop();
-            if (visitedPoints.contains(currentPoint)){
-                continue;
-            }else{
-                visitedPoints.add(currentPoint);
-            }
-
-            if (currentPoint.x > 0) {
-                Point potentialPoint = point(currentPoint.x - 1, currentPoint.y);
-                if(heightMap.get(potentialPoint) < 9) {
-                    pointsToVisit.add(potentialPoint);
-                }
-            }
-
-            if (currentPoint.x < mapWidth -1) {
-                final var potentialPoint = point(currentPoint.x + 1, currentPoint.y);
-                if(heightMap.get(potentialPoint) < 9) {
-                    pointsToVisit.add(potentialPoint);
-                }
-            }
-
-            if (currentPoint.y > 0) {
-                final var potentialPoint = point(currentPoint.x , currentPoint.y -1);
-                if(heightMap.get(potentialPoint) < 9) {
-                    pointsToVisit.add(potentialPoint);
-                }
-            }
-
-            if (currentPoint.y < mapHeight - 1) {
-                final var potentialPoint = point(currentPoint.x , currentPoint.y +1);
-                if(heightMap.get(potentialPoint) < 9) {
-                    pointsToVisit.add(potentialPoint);
-                }
-            }
-            
-        }
-        return visitedPoints;
     }
 
     private boolean localMinimum(Point currentPoint) {
@@ -110,22 +64,68 @@ public class Day09Solver implements DaySolver {
             localMinimum = heightMap.get(point(currentPoint.x - 1, currentPoint.y)) > currentValue;
         }
 
-        if (currentPoint.x < mapWidth -1) {
+        if (currentPoint.x < mapWidth - 1) {
             final var aux = heightMap.get(point(currentPoint.x + 1, currentPoint.y)) > currentValue;
             localMinimum = localMinimum && aux;
         }
 
         if (currentPoint.y > 0) {
-            final var aux = heightMap.get(point(currentPoint.x , currentPoint.y -1)) > currentValue;
+            final var aux = heightMap.get(point(currentPoint.x, currentPoint.y - 1)) > currentValue;
             localMinimum = localMinimum && aux;
         }
 
         if (currentPoint.y < mapHeight - 1) {
-            final var aux = heightMap.get(point(currentPoint.x , currentPoint.y +1)) > currentValue;
+            final var aux = heightMap.get(point(currentPoint.x, currentPoint.y + 1)) > currentValue;
             localMinimum = localMinimum && aux;
         }
 
         return localMinimum;
+    }
+
+
+    private Set<Point> basin(Point localMinimum) {
+        Set<Point> visitedPoints = new HashSet<>();
+        Deque<Point> pointsToVisit = new LinkedList<>();
+        pointsToVisit.add(localMinimum);
+
+        while (!pointsToVisit.isEmpty()) {
+            final var currentPoint = pointsToVisit.pop();
+            if (visitedPoints.contains(currentPoint)) {
+                continue;
+            } else {
+                visitedPoints.add(currentPoint);
+            }
+
+            if (currentPoint.x > 0) {
+                Point potentialPoint = point(currentPoint.x - 1, currentPoint.y);
+                if (heightMap.get(potentialPoint) < 9) {
+                    pointsToVisit.add(potentialPoint);
+                }
+            }
+
+            if (currentPoint.x < mapWidth - 1) {
+                final var potentialPoint = point(currentPoint.x + 1, currentPoint.y);
+                if (heightMap.get(potentialPoint) < 9) {
+                    pointsToVisit.add(potentialPoint);
+                }
+            }
+
+            if (currentPoint.y > 0) {
+                final var potentialPoint = point(currentPoint.x, currentPoint.y - 1);
+                if (heightMap.get(potentialPoint) < 9) {
+                    pointsToVisit.add(potentialPoint);
+                }
+            }
+
+            if (currentPoint.y < mapHeight - 1) {
+                final var potentialPoint = point(currentPoint.x, currentPoint.y + 1);
+                if (heightMap.get(potentialPoint) < 9) {
+                    pointsToVisit.add(potentialPoint);
+                }
+            }
+
+        }
+        return visitedPoints;
     }
 
     public static void main(String[] args) {
