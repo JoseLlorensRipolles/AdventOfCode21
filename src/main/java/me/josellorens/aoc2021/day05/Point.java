@@ -11,6 +11,10 @@ public class Point {
         this.y = y;
     }
 
+    public static Point point(int x, int y) {
+        return new Point(x, y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
