@@ -29,28 +29,19 @@ public class Day12Solver implements DaySolver {
             });
     }
 
-    public static void main(String[] args) {
-        final var day12Solver = new Day12Solver(inputLinesForDay(12));
-        final var day12part1result = timedExecution(day12Solver::part1);
-        System.out.printf("[%.2f ms] Part1 solution: %s. %n", day12part1result.milliseconds, day12part1result.result);
-        final var day12part2result = timedExecution(day12Solver::part2);
-        System.out.printf("[%.2f ms] Part2 solution: %s. %n", day12part2result.milliseconds, day12part2result.result);
-    }
-
     @Override
     public String part1() {
         final var paths = new LinkedList<Path>();
-        final var initialVisited = new HashSet<>(List.of("start"));
-        paths.add(path().cave("start").visitedSmallCaves(initialVisited).build());
+        paths.add(path().cave("start").visitedCaves(new HashSet<>()).build());
 
-        var pathNumber = 0;
+        var numberOfPaths = 0;
         while (!paths.isEmpty()) {
             final var currentPath = paths.pop();
             final var currentCave = currentPath.cave;
             final var currentVisited = currentPath.visitedSmallCaves;
 
             if (currentCave.equals("end")) {
-                pathNumber++;
+                numberOfPaths++;
                 continue;
             }
 
@@ -60,30 +51,30 @@ public class Day12Solver implements DaySolver {
             edges.get(currentCave)
                 .stream()
                 .filter(toVisit -> !currentVisited.contains(toVisit))
-                .forEach(toVisit -> {
-                    final var visitedCopy = new HashSet<>(currentVisited);
-                    paths.add(path().cave(toVisit).visitedSmallCaves(visitedCopy).build());
-                });
+                .forEach(toVisit -> paths.add(
+                    path()
+                        .cave(toVisit)
+                        .visitedCaves(new HashSet<>(currentVisited))
+                        .build()));
         }
 
-        return String.valueOf(pathNumber);
+        return String.valueOf(numberOfPaths);
     }
 
     @Override
     public String part2() {
         final var paths = new LinkedList<Path>();
-        final var initialVisited = new HashSet<>(List.of("start"));
-        paths.add(path().cave("start").visitedSmallCaves(initialVisited).build());
+        paths.add(path().cave("start").visitedCaves(new HashSet<>()).build());
 
-        var pathNumber = 0;
+        var numberOfPaths = 0;
         while (!paths.isEmpty()) {
             final var currentPath = paths.pop();
             final var currentCave = currentPath.cave;
             final var currentVisited = currentPath.visitedSmallCaves;
-            var currentSmallTwice = currentPath.smallCaveTwice;
+            var visitedTwice = currentPath.smallCaveTwice;
 
             if (currentCave.equals("end")) {
-                pathNumber++;
+                numberOfPaths++;
                 continue;
             }
 
@@ -91,26 +82,34 @@ public class Day12Solver implements DaySolver {
                 if (!currentVisited.contains(currentCave)) {
                     currentVisited.add(currentCave);
                 } else {
-                    if (!currentCave.equals("start")) {
-                        currentSmallTwice = true;
-                    }
+                    visitedTwice = true;
                 }
             }
-            boolean finalCurrentSmallTwice = currentSmallTwice;
+            final var finalVisitedTwice = visitedTwice;
             edges.get(currentCave)
                 .stream()
-                .filter(toVisit -> !currentVisited.contains(toVisit) || !finalCurrentSmallTwice)
+                .filter(toVisit -> !currentVisited.contains(toVisit) || !finalVisitedTwice)
                 .filter(toVisit -> !toVisit.equals("start"))
-                .forEach(toVisit -> {
-                    final var visitedCopy = new HashSet<>(currentVisited);
-                    paths.add(path().cave(toVisit).visitedSmallCaves(visitedCopy).smallCaveTwice(finalCurrentSmallTwice).build());
-                });
+                .forEach(toVisit -> paths.add(
+                    path()
+                        .cave(toVisit)
+                        .visitedCaves(new HashSet<>(currentVisited))
+                        .smallCaveTwice(finalVisitedTwice)
+                        .build()));
         }
 
-        return String.valueOf(pathNumber);
+        return String.valueOf(numberOfPaths);
     }
 
     private boolean smallCave(String cave) {
         return !cave.toUpperCase().equals(cave);
+    }
+
+    public static void main(String[] args) {
+        final var day12Solver = new Day12Solver(inputLinesForDay(12));
+        final var day12part1result = timedExecution(day12Solver::part1);
+        System.out.printf("[%.2f ms] Part1 solution: %s. %n", day12part1result.milliseconds, day12part1result.result);
+        final var day12part2result = timedExecution(day12Solver::part2);
+        System.out.printf("[%.2f ms] Part2 solution: %s. %n", day12part2result.milliseconds, day12part2result.result);
     }
 }

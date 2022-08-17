@@ -20,7 +20,7 @@ public class Path {
         private String cave;
         private boolean smallCaveTwice;
 
-        public Builder visitedSmallCaves(Set<String> visitedSmallCaves) {
+        public Builder visitedCaves(Set<String> visitedSmallCaves) {
             this.visitedSmallCaves = visitedSmallCaves;
             return this;
         }
