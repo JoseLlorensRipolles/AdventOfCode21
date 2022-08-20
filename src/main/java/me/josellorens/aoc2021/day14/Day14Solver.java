@@ -5,8 +5,11 @@ import me.josellorens.aoc2021.DaySolver;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.max;
+import static java.util.Collections.min;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.toMap;
@@ -23,7 +26,7 @@ public class Day14Solver implements DaySolver {
         initialTemplate = input.get(0);
         insertionRules = range(2, input.size())
             .mapToObj(it -> input.get(it).split(" -> "))
-            .collect(toMap(it -> it[0], it-> it[1]));
+            .collect(toMap(it -> it[0], it -> it[1]));
     }
 
     @Override
@@ -56,12 +59,12 @@ public class Day14Solver implements DaySolver {
 
         final var charCount = pairCount.entrySet()
             .stream()
-            .collect(toMap(it -> it.getKey().charAt(1), Map.Entry::getValue, Math::addExact));
+            .collect(toMap(it -> it.getKey().charAt(1), Entry::getValue, Math::addExact));
         final var firstLetter = initialTemplate.charAt(0);
         charCount.put(firstLetter, charCount.get(firstLetter) + 1);
 
-        final var maxCharCount = charCount.values().stream().max(Long::compareTo).orElseThrow();
-        final var minCharCount = charCount.values().stream().min(Long::compareTo).orElseThrow();
+        final var maxCharCount = max(charCount.values());
+        final var minCharCount = min(charCount.values());
         return String.valueOf(maxCharCount - minCharCount);
     }
 
