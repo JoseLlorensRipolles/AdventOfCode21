@@ -1,15 +1,12 @@
-package me.josellorens.aoc2021;
-
-import me.josellorens.aoc2021.day16.Literal;
-import me.josellorens.aoc2021.day16.Packet;
+package me.josellorens.aoc2021.day16;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static me.josellorens.aoc2021.Operator.Builder.operator;
-import static me.josellorens.aoc2021.Operator.LengthType.PACKETS_SIZE;
-import static me.josellorens.aoc2021.Operator.LengthType.TOTAL_LENGTH;
+import static me.josellorens.aoc2021.day16.Operator.Builder.operator;
+import static me.josellorens.aoc2021.day16.Operator.LengthType.PACKETS_SIZE;
+import static me.josellorens.aoc2021.day16.Operator.LengthType.TOTAL_LENGTH;
 
 public class Operator extends Packet {
 

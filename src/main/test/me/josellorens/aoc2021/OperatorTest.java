@@ -1,12 +1,13 @@
 package me.josellorens.aoc2021;
 
+import me.josellorens.aoc2021.day16.Operator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static me.josellorens.aoc2021.Operator.Builder.operator;
-import static me.josellorens.aoc2021.Operator.LengthType.PACKETS_SIZE;
-import static me.josellorens.aoc2021.Operator.LengthType.TOTAL_LENGTH;
+import static me.josellorens.aoc2021.day16.Operator.Builder.operator;
+import static me.josellorens.aoc2021.day16.Operator.LengthType.PACKETS_SIZE;
+import static me.josellorens.aoc2021.day16.Operator.LengthType.TOTAL_LENGTH;
 import static me.josellorens.aoc2021.day16.BitGroup.Builder.bitGroup;
 import static me.josellorens.aoc2021.day16.Literal.Builder.literal;
 import static org.junit.jupiter.api.Assertions.assertEquals;

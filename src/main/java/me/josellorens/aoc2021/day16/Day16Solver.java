@@ -1,7 +1,6 @@
 package me.josellorens.aoc2021.day16;
 
 import me.josellorens.aoc2021.DaySolver;
-import me.josellorens.aoc2021.Operator;
 
 import java.util.List;
 
