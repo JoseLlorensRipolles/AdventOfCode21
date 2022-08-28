@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static java.lang.Integer.toBinaryString;
-import static java.lang.String.format;
 import static me.josellorens.aoc2021.day16.Literal.Builder.literal;
 
 public class Literal extends Packet {
@@ -45,11 +43,12 @@ public class Literal extends Packet {
 
     @Override
     public long value() {
-        StringBuilder binaryValue = new StringBuilder();
+        var result = 0L;
         for (BitGroup group : bitGroups) {
-            binaryValue.append(format("%4s", toBinaryString(group.value)).replace(' ', '0'));
+            result = result << 4;
+            result += group.value;
         }
-        return Long.parseLong(binaryValue.toString(), 2);
+        return result;
     }
 
     public static final class Builder {
