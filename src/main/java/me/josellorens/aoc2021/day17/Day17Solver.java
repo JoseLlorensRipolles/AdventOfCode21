@@ -6,6 +6,7 @@ import me.josellorens.aoc2021.day05.Point;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static java.lang.Math.abs;
 import static java.util.stream.IntStream.range;
 import static me.josellorens.aoc2021.day05.Point.point;
 import static me.josellorens.aoc2021.utils.ExecutionUtil.timedExecution;
@@ -33,23 +34,15 @@ public class Day17Solver implements DaySolver {
 
     @Override
     public String part1() {
-        final var y = Math.abs(yMin) - 1;
-        final var maxYReached = maxYReached(y);
-        return String.format("Max y reached: %d", maxYReached);
-    }
-
-    private int maxYReached(int y) {
-        return range(0, y + 1).sum();
+        final var maxYReached = range(0, abs(yMin)).sum();
+        return String.valueOf(maxYReached);
     }
 
     private int getMinXVel() {
-        var initialVel = 0;
-        while (initialVel < 1_000) {
-            initialVel++;
+        for (int initialVel = 0; initialVel < 1_000; initialVel++) {
             var position = 0;
-            var currentVel = initialVel;
-            for (int i = currentVel; i > 0; i--) {
-                position += currentVel;
+            for (int i = initialVel; i > 0; i--) {
+                position += initialVel;
                 if (position <= xMax && position >= xMin) {
                     return initialVel;
                 }
@@ -61,7 +54,7 @@ public class Day17Solver implements DaySolver {
     @Override
     public String part2() {
         final var minXVelocity = getMinXVel();
-        final var maxYVelocity = Math.abs(yMin) - 1;
+        final var maxYVelocity = abs(yMin) - 1;
 
         var validVelocities = 0;
         for (int xVel = minXVelocity; xVel <= xMax; xVel++) {
@@ -71,7 +64,6 @@ public class Day17Solver implements DaySolver {
                 }
             }
         }
-
         return String.valueOf(validVelocities);
     }
 
