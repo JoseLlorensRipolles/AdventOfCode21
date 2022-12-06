@@ -1,8 +1,10 @@
 package me.josellorens.aoc2021.day05;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 public class Point {
@@ -73,5 +75,24 @@ public class Point {
             .filter(it -> it.y >= 0)
             .filter(it -> it.y <= maxY)
             .collect(toSet());
+    }
+
+    public List<Point> orderedAdjacentIncludingItself() {
+        final var diagonalOffset = List.of(
+            point(-1, 1),
+            point(0, 1),
+            point(1, 1),
+            point(-1, 0),
+            point(0, 0),
+            point(1, 0),
+            point(-1, -1),
+            point(0, -1),
+            point(1, -1)
+        );
+
+        return diagonalOffset
+            .stream()
+            .map(this::add)
+            .collect(toList());
     }
 }
