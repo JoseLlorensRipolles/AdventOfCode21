@@ -5,6 +5,8 @@ import me.josellorens.aoc2021.DaySolver;
 import java.util.List;
 
 import static me.josellorens.aoc2021.day02.SubmarineState.Builder.initialSubmarineState;
+import static me.josellorens.aoc2021.utils.ExecutionUtil.timedExecution;
+import static me.josellorens.aoc2021.utils.InputUtil.inputLinesForDay;
 
 public class Day02Solver implements DaySolver {
 
@@ -60,5 +62,13 @@ public class Day02Solver implements DaySolver {
                 state.aim -= instruction.value;
                 break;
         }
+    }
+
+    public static void main(String[] args) {
+        final var day02Solver = new Day02Solver(inputLinesForDay(2));
+        final var day02part1result = timedExecution(day02Solver::part1);
+        System.out.printf("[%.2f ms] Part1 solution: %s. %n", day02part1result.milliseconds, day02part1result.result);
+        final var day02part2result = timedExecution(day02Solver::part2);
+        System.out.printf("[%.2f ms] Part2 solution: %s. %n", day02part2result.milliseconds, day02part2result.result);
     }
 }
